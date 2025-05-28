@@ -1,9 +1,10 @@
-package org.example.model;
+package org.example.models;
+
 public class ResponseToken {
     private String msg;
     private String token;
 
-    public ResponseToken(String msg, String token){
+    public ResponseToken(String msg, String token) {
         this.msg = msg;
         this.token = token;
     }

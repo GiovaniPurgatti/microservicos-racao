@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 type PaymentMethod = 'CARTAO' | 'BOLETO' | 'PIX';
 
 export default function Cart() {
-    const { items, totalPrice, removeItem, updateQuantity } = useCart();
+    const { items, totalPrice, removeItem, updateQuantity, clearCart } = useCart();
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CARTAO');
     const router = useRouter();
@@ -50,7 +50,7 @@ export default function Cart() {
             // Criar pagamento
             const createdPayment = await paymentService.createPayment(paymentData);
             console.log('Resposta da API de Pagamentos:', createdPayment);
-
+            clearCart();
             // Limpar carrinho e redirecionar para página de sucesso
             router.push(`/checkout/success?orderId=${order.id}&paymentId=${createdPayment.id}`);
         } catch (error) {
@@ -58,8 +58,10 @@ export default function Cart() {
             alert('Erro ao finalizar compra. Tente novamente.');
         } finally {
             setIsCheckingOut(false);
+            
         }
     };
+
 
     if (items.length === 0) {
         return (

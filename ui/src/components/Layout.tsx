@@ -6,6 +6,7 @@ import { Bars3Icon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outl
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navigation = [
   { name: 'Início', href: '/' },
@@ -18,9 +19,16 @@ function classNames(...classes: string[]) {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
   const { items } = useCart();
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -77,6 +85,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       </span>
                     )}
                   </Link>
+                </div>
+                <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                  {isAuthenticated ? (
+                    <button
+                      onClick={logout}
+                      className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      Sair
+                    </button>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      Entrar
+                    </Link>
+                  )}
                 </div>
                 <div className="-mr-2 flex items-center sm:hidden">
                   <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500">

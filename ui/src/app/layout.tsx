@@ -4,12 +4,13 @@ import "./globals.css";
 import Layout from "@/components/Layout";
 import { Toaster } from "react-hot-toast";
 import { CartProvider } from '@/contexts/CartContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PetShop - Ração de Qualidade",
-  description: "Encontre as melhores rações para seu animal de estimação",
+  title: "Sistema de Ração",
+  description: "Sistema de gerenciamento de ração",
 };
 
 export default function RootLayout({
@@ -20,9 +21,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={inter.className}>
-        <CartProvider>
-          <Layout>{children}</Layout>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Layout>{children}</Layout>
+          </CartProvider>
+        </AuthProvider>
         <Toaster position="top-right" />
       </body>
     </html>

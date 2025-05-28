@@ -1,98 +1,118 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { userService } from '@/services/user';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
-
-const schema = yup.object({
-  Email: yup.string().email('Email inválido').required('Email é obrigatório'),
-  Senha: yup.string().required('Senha é obrigatória'),
-}).required();
-
-type FormData = yup.InferType<typeof schema>;
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: yupResolver(schema)
-  });
+    const router = useRouter();
+    const { login } = useAuth();
+    const [formData, setFormData] = useState({
+        username: '',
+        senha: ''
+    });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      const user = await userService.login(data.Email, data.Senha);
-      if (user) {
-        toast.success('Login realizado com sucesso!');
-        router.push('/');
-      } else {
-        toast.error('Email ou senha inválidos.');
-      }
-    } catch (error) {
-      toast.error('Erro ao fazer login. Tente novamente.');
-    }
-  };
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-  return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Entre na sua conta
-        </h2>
-      </div>
+        try {
+            await login(formData.username, formData.senha);
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Erro ao fazer login');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <label htmlFor="Email" className="block text-sm font-medium leading-6 text-gray-900">
-              Email
-            </label>
-            <div className="mt-2">
-              <input
-                {...register('Email')}
-                type="email"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-              {errors.Email && (
-                <p className="mt-2 text-sm text-red-600">{errors.Email.message}</p>
-              )}
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Entre na sua conta
+                </h2>
             </div>
-          </div>
 
-          <div>
-            <label htmlFor="Senha" className="block text-sm font-medium leading-6 text-gray-900">
-              Senha
-            </label>
-            <div className="mt-2">
-              <input
-                {...register('Senha')}
-                type="password"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-              {errors.Senha && (
-                <p className="mt-2 text-sm text-red-600">{errors.Senha.message}</p>
-              )}
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+                                {error}
+                            </div>
+                        )}
+
+                        <div>
+                            <label htmlFor="username" className="block text-sm font-medium text-black">
+                                Usuário
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    required
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 text-black"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor="senha" className="block text-sm font-medium text-black">
+                                Senha
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="senha"
+                                    name="senha"
+                                    type="password"
+                                    required
+                                    value={formData.senha}
+                                    onChange={handleChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 text-black"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                            >
+                                {loading ? 'Entrando...' : 'Entrar'}
+                            </button>
+                        </div>
+                    </form>
+
+                    <div className="mt-6">
+                        <div className="relative">
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-2 bg-white text-black">
+                                    Não tem uma conta?{' '}
+                                    <Link href="/register" className="font-medium text-green-600 hover:text-green-500">
+                                        Cadastre-se
+                                    </Link>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Entrar
-            </button>
-          </div>
-        </form>
-
-        <p className="mt-10 text-center text-sm text-gray-500">
-          Não tem uma conta?{' '}
-          <a href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-            Crie uma agora
-          </a>
-        </p>
-      </div>
-    </div>
-  );
+        </div>
+    );
 } 

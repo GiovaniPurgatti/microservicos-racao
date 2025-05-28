@@ -1,34 +1,57 @@
 package org.example.models;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-
 @Entity
 public class Usuario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String Nome;
-    private String Email;
-    private String Senha;
+    private String nome;
+    private String email;
+    private String senha;
+    private String username;
 
+    public Long getId() {
+        return id;
+    }
 
-    public String getNome() { return Nome;}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public void setNome(String nome) { Nome = nome;}
+    public String getNome() {
+        return nome;
+    }
 
-    public String getEmail() {return Email;}
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-    public void setEmail(String telefone) {Email = telefone;}
+    public String getEmail() {
+        return email;
+    }
 
-    public String getSenha() {return Senha;}
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
 
     public void setSenha(String senha) {
-        Senha = senha;
+        this.senha = senha;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
