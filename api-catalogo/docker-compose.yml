@@ -6,23 +6,35 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: adminroot
       MYSQL_DATABASE: db_catalogo
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
       - "3308:3306"
     volumes:
-      - ./db-init:/docker-entrypoint-initdb.d
+      - ./mysql-init/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-padminroot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
     build: .
     container_name: "api-catalogo"
     depends_on:
-      - db
-    command: ["sh", "-c", "sleep 10 && java -jar app.jar"]
+      db:
+        condition: service_healthy
     ports:
       - "8084:8081"
     networks:
       - app_network
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-catalogo:3306/db_catalogo?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&useUnicode=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=adminroot
 
 networks:
   app_network:

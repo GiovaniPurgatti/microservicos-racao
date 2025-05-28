@@ -1,10 +1,10 @@
 version: "3.8"
 services:
-  db:
+  db-pagamento:
     image: mysql:8.0.30
     container_name: "db-pagamento"
     environment:
-      MYSQL_ROOT_PASSWORD: adminroot
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db_pagamento
     ports:
       - "3309:3306"
@@ -12,17 +12,28 @@ services:
       - ./db-init:/docker-entrypoint-initdb.d
     networks:
       - app_network
-  api:
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api-pagamento:
     build: .
     container_name: "api-pagamento"
     depends_on:
-      - db
+      db-pagamento:
+        condition: service_healthy
     ports:
-      - "8081:8081"
+      - "8083:8081"
     networks:
       - app_network
-
-  
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-pagamento:3306/db_pagamento?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
 
 networks:
   app_network:
