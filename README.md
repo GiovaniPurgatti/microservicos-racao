@@ -27,6 +27,16 @@ Para executar cada serviço, siga os passos abaixo:
 
 Repita estes passos para cada serviço que deseja executar.
 
+3. Navegue ate a pasta do frontend:
+   ```bash
+   cd ui
+   ```
+
+4. Execute o frontend:
+   ```bash
+   npm run dev
+   ```
+
 ## Requisitos
 
 - Docker
