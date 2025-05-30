@@ -9,38 +9,43 @@ export default function OrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const { user, isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
+    const [id, setId] = useState<number | null>();
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            if (!isAuthenticated || !user?.id) {
-                setLoading(false);
-                return;
+   useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        setId(userId ? parseInt(userId) : null);
+    }, []);
+
+        useEffect(() => {
+            const fetchOrders = async () => {
+                if (!isAuthenticated || !id) {
+                    return;
+                }
+                try {
+                    const data = await orderService.getOrdersByClientId(id);
+                    setOrders(data);
+                } catch (err) {
+                    console.error('Erro ao carregar pedidos:', err);
+                    setError('Erro ao carregar pedidos. Por favor, tente novamente.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            fetchOrders();
+        }, [isAuthenticated, id]); 
+
+
+            if (!isAuthenticated) {
+                return (
+                    <ProtectedRoute>
+                        <div className="flex justify-center items-center h-64">
+                            <div className="text-lg text-gray-600">Por favor, faça login para ver seus pedidos.</div>
+                        </div>
+                    </ProtectedRoute>
+                );
             }
-            
-            try {
-                const data = await orderService.getOrdersByClientId(user.id);
-                setOrders(data);
-            } catch (err) {
-                console.error('Erro ao carregar pedidos:', err);
-                setError('Erro ao carregar pedidos. Por favor, tente novamente.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchOrders();
-    }, [isAuthenticated, user?.id]);
-
-    if (!isAuthenticated) {
-        return (
-            <ProtectedRoute>
-                <div className="flex justify-center items-center h-64">
-                    <div className="text-lg text-gray-600">Por favor, faça login para ver seus pedidos.</div>
-                </div>
-            </ProtectedRoute>
-        );
-    }
 
     if (loading) {
         return (

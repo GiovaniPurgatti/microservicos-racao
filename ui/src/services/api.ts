@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URLs das APIs
-const CATALOG_API_URL = 'http://localhost:8080/api/v1';
+const CATALOG_API_URL = 'http://localhost:8084/api/v1';
 const ORDER_API_URL = 'http://localhost:8082/api/v1';
 const PAYMENT_API_URL = 'http://localhost:8083/api/v1';
 const USER_API_URL = 'http://localhost:8083/api/v1';

@@ -26,12 +26,13 @@ public class JwtTokenProvider {
     }
 
     // Método para gerar um token JWT
-    public String generateToken(String username) {
+    public String generateToken(String username, Long id) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("id", id)
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

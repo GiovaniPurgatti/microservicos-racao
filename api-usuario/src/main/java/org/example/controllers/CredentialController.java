@@ -28,7 +28,7 @@ public class CredentialController {
         Optional<Usuario> usuario = usuarioRepository.findByUsername(loginRequest.getUsername());
         
         if (usuario.isPresent() && usuario.get().getSenha().equals(loginRequest.getSenha())) {
-            String token = jwtTokenProvider.generateToken(usuario.get().getUsername());
+            String token = jwtTokenProvider.generateToken(usuario.get().getUsername(), usuario.get().getId());
             return ResponseEntity.ok(new ResponseToken("Authenticated", token));
         }
         

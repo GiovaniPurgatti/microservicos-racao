@@ -1,4 +1,5 @@
 import axios from 'axios';
+import catalogApi from './api';
 
 export interface Product {
   id: number;
@@ -10,16 +11,15 @@ export interface Product {
   estoque: number;
 }
 
-const API_URL = 'http://localhost:8084';
 
 export const catalogService = {
   getAllProducts: async () => {
-    const response = await axios.get<Product[]>(`${API_URL}/api/v1/catalogo`);
+    const response = await catalogApi.get<Product[]>('/catalogo');
     return response.data;
   },
 
   getProductById: async (id: number) => {
-    const response = await axios.get<Product>(`${API_URL}/api/v1/catalogo/${id}`);
+    const response = await catalogApi.get<Product>(`/catalogo/${id}`);
     return response.data;
   }
 }; 

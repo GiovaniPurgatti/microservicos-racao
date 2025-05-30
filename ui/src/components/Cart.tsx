@@ -15,14 +15,16 @@ export default function Cart() {
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CARTAO');
     const router = useRouter();
+    const [id, setId] = useState<number | null>();
 
     const handleCheckout = async () => {
+            const userId = localStorage.getItem('userId');
+            setId(userId ? parseInt(userId) : null);
         try {
             setIsCheckingOut(true);
 
-            // Log dos dados do pedido
             const orderData: Order = {
-                clienteId: 1, // TODO: Usar ID do cliente logado
+                clienteId: id!,
                 itens: items.map(item => ({
                     produtoId: item.id,
                     quantidade: item.quantity,

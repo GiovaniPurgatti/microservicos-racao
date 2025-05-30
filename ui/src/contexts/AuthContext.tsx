@@ -3,11 +3,21 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService } from '@/services/auth';
 import { useRouter } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
 
 interface User {
     id: number;
     username: string;
 }
+interface JwtPayload {
+  id: number;
+  sub: string; // geralmente o username
+  email?: string;
+  nome?: string;
+  exp: number;
+  iat: number;
+}
+
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -24,45 +34,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
 
-    useEffect(() => {
-        const loadUser = async () => {
-            const token = authService.getToken();
-            if (token) {
-                try {
-                    // Recuperar o username do localStorage
-                    const username = localStorage.getItem('username');
-                    if (username) {
-                        setUser({ id: 1, username }); // Usando ID fixo 1
-                        setIsAuthenticated(true);
-                    }
-                } catch (error) {
-                    console.error('Erro ao carregar usuário:', error);
-                    authService.logout();
-                    setIsAuthenticated(false);
-                    setUser(null);
-                }
-            }
-        };
 
-        loadUser();
-    }, []);
+const login = async (username: string, senha: string) => {
+  try {
+    const response = await authService.login({ username, senha });
 
-    const login = async (username: string, senha: string) => {
-        try {
-            const response = await authService.login({ username, senha });
-            console.log('Resposta do login no contexto:', response);
-            setIsAuthenticated(true);
-            
-            // Armazenar o username para uso posterior
-            localStorage.setItem('username', username);
-            setUser({ id: 1, username }); // Usando ID fixo 1
-            
-            router.push('/');
-        } catch (error) {
-            console.error('Erro no login:', error);
-            throw error;
-        }
-    };
+    const token = response.token; 
+    const decoded: JwtPayload = jwtDecode(token);
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('userId', String(decoded.id));
+    localStorage.setItem('username', decoded.sub);
+
+    setIsAuthenticated(true);
+    setUser({ id: decoded.id, username: decoded.sub });
+
+    router.push('/');
+  } catch (error) {
+    console.error('Erro no login:', error);
+    throw error;
+  }
+};
+
 
     const register = async (userData: any) => {
         try {

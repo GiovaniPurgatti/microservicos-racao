@@ -42,7 +42,6 @@ public class Pagamento {
         PIX
     }
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
