@@ -25,7 +25,7 @@ services:
     build: .
     container_name: "api-catalogo"
     depends_on:
-      db:
+      db-catalogo:
         condition: service_healthy
     ports:
       - "8084:8081"
