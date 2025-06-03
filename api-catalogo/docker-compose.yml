@@ -13,12 +13,11 @@ services:
     networks:
       - app_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
-      interval: 10s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
       timeout: 5s
-      retries: 5
-
-
+      retries: 20
+      start_period: 30s
   api-catalogo:
     build: .
     container_name: "api-catalogo"
