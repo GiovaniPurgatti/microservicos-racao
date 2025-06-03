@@ -24,7 +24,7 @@ services:
       db-catalogo:
         condition: service_healthy
     ports:
-      - "8083:8081"
+      - "8084:8081"
     networks:
       - app_network
     environment:
