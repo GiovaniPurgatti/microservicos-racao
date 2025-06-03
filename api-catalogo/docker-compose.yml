@@ -9,13 +9,13 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - ./api-catalogo/mysql-init:/docker-entrypoint-initdb.d/01-init.sql
+      - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - app_network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 60s
-      timeout: 60s
+      interval: 10s
+      timeout: 10s
       retries: 10
 
   api-catalogo:
