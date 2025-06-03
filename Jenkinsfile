@@ -29,6 +29,12 @@ pipeline {
     }
 
     stage('Rodar frontend') {
+      agent {
+        docker {
+          image 'node:18'  // versão do Node que quiser usar
+          args '-u root'   // opcional, para rodar como root se precisar
+        }
+      }
       steps {
         dir('ui') {
           sh 'npm install'
