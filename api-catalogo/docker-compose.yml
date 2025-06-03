@@ -19,7 +19,7 @@ services:
       retries: 11
 
   api-catalogo:
-    build: ./api-catalogo
+    build: .
     container_name: "api-catalogo"
     depends_on:
       db-catalogo:
