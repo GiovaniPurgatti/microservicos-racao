@@ -9,7 +9,7 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - ./db-init:/docker-entrypoint-initdb.d
+      - ./api-catalogo/mysql-init:/docker-entrypoint-initdb.d
     networks:
       - app_network
     healthcheck:
@@ -17,8 +17,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
   api-catalogo:
-    build: .
+    build: ./api-catalogo
     container_name: "api-catalogo"
     depends_on:
       db-catalogo:
