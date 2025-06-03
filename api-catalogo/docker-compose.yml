@@ -9,7 +9,7 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - ./api-catalogo/mysql-init:/docker-entrypoint-initdb.d
+      - ./api-catalogo/mysql-init:/docker-entrypoint-initdb.d/01-init.sql
     networks:
       - app_network
     healthcheck:
