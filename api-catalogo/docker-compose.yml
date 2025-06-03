@@ -4,15 +4,12 @@ services:
     image: mysql:8.0.30
     container_name: "db-catalogo"
     environment:
-      MYSQL_ROOT_PASSWORD: adminroot
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db_catalogo
-      MYSQL_CHARSET: utf8mb4
-      MYSQL_COLLATION: utf8mb4_unicode_ci
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
-      - "3308:3306"
+      - "3309:3306"
     volumes:
-      - ./mysql-init/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db-init:/docker-entrypoint-initdb.d
     networks:
       - app_network
     healthcheck:
@@ -20,7 +17,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
   api-catalogo:
     build: .
     container_name: "api-catalogo"
@@ -28,13 +24,16 @@ services:
       db-catalogo:
         condition: service_healthy
     ports:
-      - "8084:8081"
+      - "8083:8081"
     networks:
       - app_network
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db-catalogo:3306/db_catalogo?allowPublicKeyRetrieval=true&useSSL=false&characterEncoding=UTF-8&useUnicode=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=adminroot
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-catalogo:3306/db_catalogo?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
 
 networks:
   app_network:
