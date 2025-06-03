@@ -14,9 +14,9 @@ services:
       - app_network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 11
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
   api-catalogo:
     build: .
