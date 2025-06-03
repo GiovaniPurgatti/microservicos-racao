@@ -25,7 +25,7 @@ services:
     build: .
     container_name: "api-catalogo"
     depends_on:
-      db-catalogo:
+      db-catalogo
     ports:
       - "8084:8081"
     networks:
